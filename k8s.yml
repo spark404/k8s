@@ -1,14 +1,14 @@
 ---
-- hosts: <cloudstackserver>
-  connection: ssh
+- hosts: localhost
+  connection: local
   vars:
     ssh_key: k8s
-    k8s_version: v0.11.0
+    k8s_version: v1.7.0
     k8s_num_nodes: 2
     k8s_security_group_name: k8s
     k8s_node_prefix: k8s
-    k8s_template: <templatename>
-    k8s_instance_type: <serviceofferingname>
+    k8s_template: CoreOS
+    k8s_instance_type: employee-large-ha
 
   roles:
     - common

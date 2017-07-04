@@ -1,0 +1,33 @@
+# Create k8s security group
+
+  - name: Create API port forward
+    local_action:
+        module: cs_portforward
+        ip_address: "178.237.34.187"
+        vm: "{{ k8s_node_prefix }}-head"
+        public_port: 8080
+        private_port: 8080
+
+  - name: Create SSH port forward 
+    local_action:
+        module: cs_portforward
+        ip_address: "178.237.34.187"
+        vm: "{{ k8s_node_prefix }}-head"
+        public_port: 2216
+        private_port: 22
+
+  - name: Create SSH port forward node-1
+    local_action:
+        module: cs_portforward
+        ip_address: "178.237.34.187"
+        vm: "{{ k8s_node_prefix }}-node-1"
+        public_port: 2217
+        private_port: 22
+
+  - name: Create SSH port forward node-2
+    local_action:
+        module: cs_portforward
+        ip_address: "178.237.34.187"
+        vm: "{{ k8s_node_prefix }}-node-2"
+        public_port: 2218
+        private_port: 22

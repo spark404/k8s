@@ -7,8 +7,8 @@
     etcd_num_nodes: 3
     etcd_security_group_name: etcd
     etcd_node_prefix: etcd
-    etcd_template: Linux CoreOS alpha 435 64-bit 10GB Disk 
-    etcd_instance_type: Tiny
+    etcd_template: CoreOS
+    etcd_instance_type: employee-tiny
 
   pre_tasks:
     - name: Get bootstrap token for etcd

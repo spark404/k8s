@@ -2,9 +2,9 @@
 localhost ansible_python_interpreter=/System/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
 [nodes]
+10.1.1.159
+10.1.1.220
 10.1.1.14
-10.1.1.228
-10.1.1.13
 
 [nodes:vars]
 ansible_ssh_user=core

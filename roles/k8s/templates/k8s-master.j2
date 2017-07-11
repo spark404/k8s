@@ -7,6 +7,14 @@ write_files:
   content: |
     #! /usr/bin/bash
     until curl http://127.0.0.1:4001/v2/machines; do sleep 2; done
+- path: /opt/cloudstack.conf
+  owner: root
+  content: |
+    [global]
+    api-url={{ cs_api_url }}
+    api-key={{ cs_api_key }}
+    secret-key={{ cs_api_secret }}
+    ssl-no-verify={{ cs_ssl_verify }}
 coreos:
   units:
     - name: setup-network-environment.service
@@ -141,6 +149,7 @@ coreos:
         --etcd_servers=http://127.0.0.1:4001 \
         --public_address_override=$private_ipv4 \
         --logtostderr=true \
+        --cloud-provider=external \
         -v 2
         Restart=always
         RestartSec=10
@@ -174,6 +183,24 @@ coreos:
         ExecStartPre=/bin/tar -xvzf /opt/kubernetes-server-linux-amd64.tar.gz -C /opt kubernetes/server/bin/kube-scheduler
         ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/kube-scheduler
         ExecStart=/opt/kubernetes/server/bin/kube-scheduler --master=127.0.0.1:8080
+        Restart=always
+        RestartSec=10
+    - name: cloud-controller-manager.service
+      command: start
+      content: |
+        [Unit]
+        Description=Kubernetes Cloud Controller Manager
+        Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+        Requires=kube-apiserver.service
+        After=kube-apiserver.service
+
+        [Service]
+        ExecStartPre=/bin/tar -xvzf /opt/kubernetes-server-linux-amd64.tar.gz -C /opt kubernetes/server/bin/cloud-controller-manager
+        ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/cloud-controller-manager
+        ExecStart=/opt/kubernetes/server/bin/cloud-controller-manager \
+        --cloud-provider=cloudstack \
+        --cloud-config=/opt/cloudstack.conf \
+        --master=http://127.0.0.1:8080
         Restart=always
         RestartSec=10
     - name: kube-register.service

@@ -1,7 +1,31 @@
 #cloud-config
 
+write_files:
+  - path: "/opt/mount_xvdb.sh"
+    permissions: "744"
+    owner: root
+    content: |
+      PATH=$PATH:/bin/:/sbin
+      if blkid /dev/xvdb | grep ext4
+        then 
+          echo "Already formatted"
+        else 
+          /sbin/mkfs.ext4 /dev/xvdb 
+      fi
+      
+      mkdir /var/lib/docker
+      mount /dev/xvdb /var/lib/docker
 coreos:
   units:
+    - name: xvdbmount.service
+      command: start
+      content: |
+        [Unit]
+        Description=Mount extra disk on /var/lib/docker
+
+        [Service]
+        ExecStart=/bin/bash -x /opt/mount_xvdb.sh
+        Type=oneshot    
     - name: etcd.service
       mask: true
     - name: fleet.service

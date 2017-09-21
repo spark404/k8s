@@ -1,30 +1,30 @@
 #cloud-config
 
 write_files:
-  - path: "/opt/mount_xvdb.sh"
+  - path: "/opt/mount_vdb.sh"
     permissions: "744"
     owner: root
     content: |
       PATH=$PATH:/bin/:/sbin
-      if blkid /dev/xvdb | grep ext4
+      if blkid /dev/vdb | grep ext4
         then 
           echo "Already formatted"
         else 
-          /sbin/mkfs.ext4 /dev/xvdb 
+          /sbin/mkfs.ext4 /dev/vdb 
       fi
       
       mkdir /var/lib/docker
-      mount /dev/xvdb /var/lib/docker
+      mount /dev/vdb /var/lib/docker
 coreos:
   units:
-    - name: xvdbmount.service
+    - name: vdbmount.service
       command: start
       content: |
         [Unit]
         Description=Mount extra disk on /var/lib/docker
 
         [Service]
-        ExecStart=/bin/bash -x /opt/mount_xvdb.sh
+        ExecStart=/bin/bash -x /opt/mount_vdb.sh
         Type=oneshot    
     - name: etcd.service
       mask: true

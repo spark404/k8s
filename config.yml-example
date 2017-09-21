@@ -1,0 +1,9 @@
+ansible_python_interpreter: ./.venv/bin/python
+cs_api_url: https://beta-nl2.mcc.schubergphilis.com/client/api/
+cs_api_key: yourkey
+cs_api_secret: yoursecret
+k8s_external_ip: 195.43.158.250
+k8s_cloudstack_network: kubernetes
+k8s_template: Coreos
+k8s_instance_type: MCC_v2.2vCPU.8GB.SBP1
+k8s_node_disktype: MCC.v1-40GB

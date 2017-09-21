@@ -18,23 +18,23 @@ write_files:
 - path: /srv/kubernetes/ca.crt
   owner: root
   content: |
-    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/ca.crt') | indent}}
+    {{ lookup('file', 'certificates/ca.crt') | indent}}
 - path: /srv/kubernetes/server.key
   owner: root
   content: |
-    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/server.key') | indent }}
+    {{ lookup('file', 'certificates/server.key') | indent }}
 - path: /srv/kubernetes/server.crt
   owner: root
   content: |
-    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/server.crt') | indent }}
+    {{ lookup('file', 'certificates/server.crt') | indent }}
 - path: /srv/kubernetes/service-accounts.key
   owner: root
   content: |
-    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/service-accounts.key') | indent }}
+    {{ lookup('file', 'certificates/service-accounts.key') | indent }}
 - path: /srv/kubernetes/service-accounts.crt
   owner: root
   content: |
-    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/service-accounts.crt') | indent }}
+    {{ lookup('file', 'certificates/service-accounts.crt') | indent }}
 coreos:
   units:
     - name: setup-network-environment.service

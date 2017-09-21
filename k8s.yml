@@ -8,13 +8,13 @@
     k8s_security_group_name: k8s
     k8s_cloudstack_network: kubernetes
     k8s_node_prefix: k8s
-    k8s_template: CoreOS
-    k8s_instance_type: MCC_v2.2vCPU.4GB.SBP1
-    k8s_node_disktype: MCC.v1-40GB
-    k8s_external_ip: 195.43.158.219
-    cs_api_url: https://beta-nl2.mcc.schubergphilis.com/client/api/
-    cs_api_key: XX
-    cs_api_secret: XX
+    k8s_template: "{{ k8s_template }}"
+    k8s_instance_type: "{{ k8s_instance_type }}"
+    k8s_node_disktype: "{{ k8s_node_disktype }}"
+    k8s_external_ip: "{{ k8s_external_ip }}"
+    cs_api_url: "{{ cs_api_url }}"
+    cs_api_key: "{{ cs_api_key }}"
+    cs_api_secret: "{{ cs_api_secret }}"
     cs_ssl_verify: false
   roles:
     - common

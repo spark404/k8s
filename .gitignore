@@ -1,2 +1,6 @@
 cloudstack.ini
 *.retry
+.venv/
+config.yml
+certificates/
+inventory

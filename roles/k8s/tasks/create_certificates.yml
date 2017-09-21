@@ -1,0 +1,31 @@
+- name: Create Folder
+  file: 
+    path: certificates
+    mode: 0755 
+    state: directory
+
+- stat:
+    path: certificates/server.crt
+  register: st
+
+
+- name: Create the certificates for the kubernetes deployement
+  shell: |
+        openssl genrsa -out certificates/ca.key 2048
+        openssl req -x509 -new -nodes -key certificates/ca.key -subj "/CN={{k8s_external_ip}}" -days 10000 -out certificates/ca.crt
+
+        openssl genrsa -out certificates/server.key 2048
+        openssl req -new -key certificates/server.key -subj "/CN={{k8s_external_ip}}" -out certificates/server.csr
+
+        openssl x509 -req -in certificates/server.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/server.crt -days 10000
+        openssl x509  -noout -text -in certificates/server.crt
+
+        openssl genrsa -out certificates/service-accounts.key 2048
+        openssl req -new -key certificates/service-accounts.key -subj "/CN={{k8s_external_ip}}" -out certificates/service-accounts.csr
+
+        openssl x509 -req -in certificates/service-accounts.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/service-accounts.crt -days 10000
+        openssl x509  -noout -text -in certificates/server.crt
+  args:
+        executable: /bin/bash
+  delegate_to: localhost
+  when: not st.stat.exists

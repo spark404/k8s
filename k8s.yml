@@ -6,15 +6,15 @@
     k8s_version: v1.7.0
     k8s_num_nodes: 2
     k8s_security_group_name: k8s
-    k8s_cloudstack_network: htrippaers-default
+    k8s_cloudstack_network: kubernetes
     k8s_node_prefix: k8s
     k8s_template: CoreOS
-    k8s_instance_type: mcc_v1.2vCPU.4GB.SBP1
+    k8s_instance_type: MCC_v2.2vCPU.4GB.SBP1
     k8s_node_disktype: MCC.v1-40GB
-    k8s_external_ip: 178.237.34.187
-    cs_api_url: xxx
-    cs_api_key: xxx
-    cs_api_secret: xxx
+    k8s_external_ip: 195.43.158.219
+    cs_api_url: https://beta-nl2.mcc.schubergphilis.com/client/api/
+    cs_api_key: XX
+    cs_api_secret: XX
     cs_ssl_verify: false
   roles:
     - common

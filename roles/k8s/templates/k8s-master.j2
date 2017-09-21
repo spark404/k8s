@@ -15,6 +15,26 @@ write_files:
     api-key={{ cs_api_key }}
     secret-key={{ cs_api_secret }}
     ssl-no-verify={{ cs_ssl_verify }}
+- path: /srv/kubernetes/ca.crt
+  owner: root
+  content: |
+    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/ca.crt') | indent}}
+- path: /srv/kubernetes/server.key
+  owner: root
+  content: |
+    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/server.key') | indent }}
+- path: /srv/kubernetes/server.crt
+  owner: root
+  content: |
+    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/server.crt') | indent }}
+- path: /srv/kubernetes/service-accounts.key
+  owner: root
+  content: |
+    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/service-accounts.key') | indent }}
+- path: /srv/kubernetes/service-accounts.crt
+  owner: root
+  content: |
+    {{ lookup('file', '/Users/htrippaers/Documents/kubernetes/k8s/certificates/service-accounts.crt') | indent }}
 coreos:
   units:
     - name: setup-network-environment.service
@@ -150,6 +170,10 @@ coreos:
         --public_address_override=$private_ipv4 \
         --logtostderr=true \
         --cloud-provider=external \
+        --client-ca-file=/srv/kubernetes/ca.crt \
+        --tls-cert-file=/srv/kubernetes/server.crt \
+        --tls-private-key-file=/srv/kubernetes/server.key \
+        --service-account-key-file=/srv/kubernetes/service-accounts.crt \
         -v 2
         Restart=always
         RestartSec=10
@@ -167,6 +191,8 @@ coreos:
         ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/kube-controller-manager
         ExecStart=/opt/kubernetes/server/bin/kube-controller-manager \
         --master=127.0.0.1:8080 \
+        --service-account-private-key-file=/srv/kubernetes/service-accounts.key \
+        --root-ca-file=/srv/kubernetes/ca.crt \
         --logtostderr=true
         Restart=always
         RestartSec=10

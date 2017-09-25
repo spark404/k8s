@@ -55,7 +55,7 @@ coreos:
         ExecStartPre=-/usr/bin/mkdir -p /opt/bin
         ExecStartPre=/usr/bin/wget -N -P /opt/bin https://github.com/coreos/flannel/releases/download/v0.7.0/flanneld-amd64
         ExecStartPre=/usr/bin/chmod +x /opt/bin/flanneld-amd64
-        ExecStart=/opt/bin/flanneld-amd64 -etcd-endpoints http://{{ k8s_master.default_ip}}:4001
+        ExecStart=/opt/bin/flanneld-amd64 -etcd-endpoints http://{{ k8s_master.default_ip}}:4001 --ip-masq=true
     - name: docker.service
       command: start
       content: |

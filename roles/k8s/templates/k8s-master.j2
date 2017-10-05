@@ -7,7 +7,7 @@ write_files:
   content: |
     #! /usr/bin/bash
     until curl http://127.0.0.1:4001/v2/machines; do sleep 2; done
-- path: /opt/cloudstack.conf
+- path: /etc/cloudstack.conf
   owner: root
   content: |
     [global]
@@ -165,15 +165,17 @@ coreos:
         ExecStart=/opt/kubernetes/server/bin/kube-apiserver \
         --address=0.0.0.0 \
         --port=8080 \
-        --portal_net=10.244.0.0/16 \
+        --service-cluster-ip-range=10.250.0.0/24 \
         --etcd_servers=http://127.0.0.1:4001 \
         --public_address_override=$private_ipv4 \
         --logtostderr=true \
-        --cloud-provider=external \
+        --cloud-provider=cloudstack \
+        --cloud-config=/etc/cloudstack.conf \
         --client-ca-file=/srv/kubernetes/ca.crt \
         --tls-cert-file=/srv/kubernetes/server.crt \
         --tls-private-key-file=/srv/kubernetes/server.key \
         --service-account-key-file=/srv/kubernetes/service-accounts.crt \
+        --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds \
         -v 2
         Restart=always
         RestartSec=10
@@ -193,6 +195,9 @@ coreos:
         --master=127.0.0.1:8080 \
         --service-account-private-key-file=/srv/kubernetes/service-accounts.key \
         --root-ca-file=/srv/kubernetes/ca.crt \
+        --cloud-provider=cloudstack \
+        --cloud-config=/etc/cloudstack.conf \
+        --cluster-signing-cert-file=/srv/kubernetes/server.crt --cluster-signing-key-file=/srv/kubernetes/server.key \
         --logtostderr=true
         Restart=always
         RestartSec=10
@@ -225,28 +230,8 @@ coreos:
         ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/cloud-controller-manager
         ExecStart=/opt/kubernetes/server/bin/cloud-controller-manager \
         --cloud-provider=cloudstack \
-        --cloud-config=/opt/cloudstack.conf \
+        --cloud-config=/etc/cloudstack.conf \
         --master=http://127.0.0.1:8080
-        Restart=always
-        RestartSec=10
-    - name: kube-register.service
-      command: start
-      content: |
-        [Unit]
-        Description=Kubernetes Registration Service
-        Documentation=https://github.com/kelseyhightower/kube-register
-        Requires=kube-apiserver.service
-        After=kube-apiserver.service
-        Requires=fleet.service
-        After=fleet.service
-
-        [Service]
-        ExecStartPre=/usr/bin/wget -N -P /opt/bin https://storage.googleapis.com/k8s/kube-register
-        ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-register
-        ExecStart=/opt/bin/kube-register \
-        --metadata=role=node \
-        --fleet-endpoint=unix:///var/run/fleet.sock \
-        --api-endpoint=http://127.0.0.1:8080
         Restart=always
         RestartSec=10
   update:

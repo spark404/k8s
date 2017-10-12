@@ -32,14 +32,10 @@ def main():
     poll_async = dict(type='bool', default=True),
   ))
 
-  # replaceNetworkACLList
-
   module = AnsibleModule(argument_spec=argument_spec, required_together=cs_required_together())
   acs_acl = AnsibleCloudstackNetworkACL(module)
 
-  #ip = acs_ip_address.get_ip_address()
   result = {}
-  #acs_ip_address.get_result(ip)
 
   module.exit_json(**result)
 

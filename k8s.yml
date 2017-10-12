@@ -3,15 +3,10 @@
   connection: local
   vars:
     ssh_key: k8s
-    k8s_version: v1.8.0
+    k8s_version: v1.8.1
     k8s_num_nodes: 2
     k8s_security_group_name: k8s
-    k8s_cloudstack_network: "{{ k8s_cloudstack_network }}"
     k8s_node_prefix: k8s
-    k8s_template: "{{ k8s_template }}"
-    k8s_instance_type: "{{ k8s_instance_type }}"
-    k8s_node_disktype: "{{ k8s_node_disktype }}"
-    k8s_external_ip: "{{ k8s_external_ip }}"
     cs_api_url: "{{ cs_api_url }}"
     cs_api_key: "{{ cs_api_key }}"
     cs_api_secret: "{{ cs_api_secret }}"

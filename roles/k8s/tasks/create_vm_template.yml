@@ -1,0 +1,15 @@
+  - name: Create Template image
+    local_action:
+      module: cs_template
+      name: "{{ k8s_template }}"
+      display_text: "CoreOS Image for Kubernetes"
+      format: QCOW2
+      hypervisor: KVM
+      password_enabled: True
+      sshkey_enabled: True
+      requires_hvm: True
+      url: "{{ k8s_template_url }}"
+      os_type: "CoreOS Family"
+    register: k8s_cloudstack_template
+
+#  - debug: msg='k8s_cloudstack_template ID is {{ k8s_cloudstack_template.id }}'

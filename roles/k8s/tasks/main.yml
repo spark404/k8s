@@ -1,4 +1,7 @@
 ---
+  - include: create_vpc.yml
+  - include: create_vpc_tier.yml
+  - include: create_vm_template.yml
   - include: create_certificates.yml
   - include: create_vm.yml
   - include: create_inv.yml

@@ -33,7 +33,13 @@
         openssl req -new -key certificates/service-accounts.key -subj "/CN={{k8s_external_ip}}" -out certificates/service-accounts.csr -config certificates/master-openssl.cnf
 
         openssl x509 -req -in certificates/service-accounts.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/service-accounts.crt -days 10000 -extensions v3_req -extfile certificates/master-openssl.cnf
-        openssl x509  -noout -text -in certificates/server.crt
+        openssl x509  -noout -text -in certificates/service-account.crt
+
+        openssl genrsa -out certificates/dashboard.key 2048
+        openssl req -new -key certificates/dashboard.key -subj "/CN={{k8s_external_ip}}" -out certificates/dashboard.csr -config certificates/master-openssl.cnf
+
+        openssl x509 -req -in certificates/dashboard.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/dashboard.crt -days 10000 -extensions v3_req -extfile certificates/master-openssl.cnf
+        openssl x509  -noout -text -in certificates/dashboard.crt
   args:
         executable: /bin/bash
   delegate_to: localhost

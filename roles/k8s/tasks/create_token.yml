@@ -1,0 +1,28 @@
+- stat:
+    path: certificates/token.txt
+  register: st_token
+
+- name: Create authentication token
+  shell: |
+         dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null
+  args:
+    executable: /bin/bash
+  delegate_to: localhost
+  register: new_token
+  when: not st_token.stat.exists
+
+- name: Write token to disk
+  copy: content="{{ new_token.stdout }}" dest="certificates/token.txt"
+  when: not st_token.stat.exists
+
+- name: Read out existing token
+  set_fact:
+    existing_token: "{{ lookup('file', 'certificates/token.txt') }}"
+  when: st_token.stat.exists
+
+# https://github.com/ansible/ansible/issues/4297
+- name: Fixing weird ansible behaviour
+  set_fact:
+    k8s_token: "{{ new_token.stdout if not st_token.stat.exists else existing_token }}"
+
+- debug: msg='Your k8s_token is {{ k8s_token }}'

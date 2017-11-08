@@ -35,6 +35,10 @@ write_files:
   owner: root
   content: |
     {{ lookup('file', 'certificates/service-accounts.crt') | indent }}
+- path: /srv/kubernetes/known_tokens.csv
+  owner: root
+  content: |
+    {{ k8s_token }},{{k8s_username}},{{k8s_username}},"system:masters"
 coreos:
   units:
     - name: setup-network-environment.service
@@ -163,11 +167,12 @@ coreos:
         ExecStartPre=/bin/tar -xvzf /opt/kubernetes-server-linux-amd64.tar.gz -C /opt kubernetes/server/bin/kube-apiserver
         ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/kube-apiserver
         ExecStart=/opt/kubernetes/server/bin/kube-apiserver \
-        --address=0.0.0.0 \
-        --port=8080 \
+        --bind-address=$private_ipv4 \
+        --secure-port=6443 \
+        --insecure-bind-address=0.0.0.0 \
+        --insecure-port=8080 \
         --service-cluster-ip-range=10.250.0.0/24 \
         --etcd_servers=http://127.0.0.1:4001 \
-        --public_address_override=$private_ipv4 \
         --logtostderr=true \
         --cloud-provider=cloudstack \
         --cloud-config=/etc/cloudstack.conf \
@@ -175,7 +180,9 @@ coreos:
         --tls-cert-file=/srv/kubernetes/server.crt \
         --tls-private-key-file=/srv/kubernetes/server.key \
         --service-account-key-file=/srv/kubernetes/service-accounts.crt \
-        --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds \
+        --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds \
+        --token-auth-file=/srv/kubernetes/known_tokens.csv \
+        --authorization-mode=RBAC \
         -v 2
         Restart=always
         RestartSec=10

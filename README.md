@@ -6,16 +6,10 @@ Basic recipes using the ansible cloudstack module to create ssh keys, sec group 
 Prerequisites
 -------------
 
-You will need Ansible and [cs](https://github.com/exoscale/cs) :)
+You will need python 2.7 or higher with [virtualenv](https://pypi.python.org/pypi/virtualenv)
 
-    $ sudo apt-get install -y python-pip libssl-dev
-    $ sudo pip install cs
-    $ sudo pip install sshpubkeys
-    $ sudo apt-get install software-properties-common
-    $ sudo apt-add-repository ppa:ansible/ansible
-    $ sudo apt-get update
-    $ sudo apt-get install ansible
-
+    $ sudo pip install virtualenv
+    
 Setup cs
 --------
 
@@ -40,16 +34,29 @@ On CloudStack server you have to install libselinux-python
 
     yum install libselinux-python
 
-Clone the repository
+Clone the repository and setup environment
 ---------------
 
+This will install [cs](https://github.com/exoscale/cs) and Ansible
+
     $ git clone https://github.com/apachecloudstack/k8s
-    $ cd ansible-kubernetes
+    $ cd k8s
+    $ python -mvenv .venv
+    $ source .venv/bin/activate
+    $ pip install -r requirements.txt
+
+Configure Ansible
+-----------------
+
+Copy and edit config.yml
+
+    $ cp config.yml-example config.yml
+    
 
 Create a Kubernetes cluster
 ---------------------------
 
-    $ ansible-playbook k8s.yml
+    $ ansible-playbook --extra-vars @config.yml k8s.yml
 
 Some variables can be edited in the `k8s.yml` file.
 This will start a Kubernetes master node and a number of compute nodes.

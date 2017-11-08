@@ -2,6 +2,7 @@ ansible_python_interpreter: ./.venv/bin/python
 cs_api_url: https://beta-nl2.mcc.schubergphilis.com/client/api/
 cs_api_key: ""
 cs_api_secret: ""
+k8s_username: "{{ lookup('env','USER') }}"
 k8s_external_ip: "{{k8s_vpc_network_ip.ip_address}}"
 k8s_cloudstack_network: net_k8s
 k8s_cloudstack_network_offering: MCC-VPC-LB

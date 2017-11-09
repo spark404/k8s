@@ -70,6 +70,37 @@ If you retrieve an error during the ssh key copy:
 
 Please run the Playbook a second time [(related issue)](https://github.com/apachecloudstack/k8s/issues/5)
 
+Install and configure kubectl
+-----------------------------
+
+Now you should have a working cluster.
+
+Install kubectl using the following instructions: https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
+Configure your credentials:
+
+    $ kubectl config set-credentials $USER --client-certificate=certificates/client.crt --client-key=certificates/client.key --embed-certs=true --token=$(cat certificates/token.txt)   
+    $ kubectl config set-context default/betanl2/kubeuser --cluster=betanl2 --user=$USER
+
+Deploy your first resources
+---------------------------
+
+Dashboard:
+
+    # This will create the certificate
+    $ kubectl create secret generic kubernetes-dashboard-certs --from-file=certificates/dashboard -n kube-system
+    
+    # Deploy the dashboard
+    $ kubectl apply -f resources/kubernetes-dashboard.yaml
+
+CoreDNS:
+    
+    $ kubectl apply -f resources/coredns.yaml
+
+Heapster:
+
+    $ kubectl apply -f resources/heapster
+
 Create etcd cluster
 -------------------
 

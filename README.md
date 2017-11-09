@@ -79,8 +79,11 @@ Install kubectl using the following instructions: https://kubernetes.io/docs/tas
 
 Configure your credentials:
 
-    $ kubectl config set-credentials $USER --client-certificate=certificates/client.crt --client-key=certificates/client.key --embed-certs=true --token=$(cat certificates/token.txt)   
-    $ kubectl config set-context default/betanl2/kubeuser --cluster=betanl2 --user=$USER
+    $ kubectl config set-cluster betanl2 --certificate-authority=certificates/ca.crt --embed-certs=true --server=https://<your public ip>:6443
+    $ kubectl config set-credentials $USER --client-certificate=certificates/client.crt --client-key=certificates/client.key --embed-certs=true --token=$(cat certificates/token.txt)
+    $ kubectl config set-context default/betanl2/$USER --cluster=betanl2 --namespace=default --user=$USER
+    $ kubectl config use-context default/betanl2/$USER
+
 
 Deploy your first resources
 ---------------------------

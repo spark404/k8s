@@ -146,6 +146,7 @@ coreos:
         ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/kube-proxy
         ExecStart=/opt/kubernetes/server/bin/kube-proxy \
         --master=http://{{ k8s_master.default_ip}}:8080 \
+        --cluster-cidr=10.1.1.0/25 \
         --logtostderr=true
         Restart=always
         RestartSec=10

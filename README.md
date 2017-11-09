@@ -84,6 +84,16 @@ Configure your credentials:
     $ kubectl config set-context default/betanl2/$USER --cluster=betanl2 --namespace=default --user=$USER
     $ kubectl config use-context default/betanl2/$USER
 
+Test if you can reach k8s
+-------------------------
+
+    $ kubectl cluster-info
+    Kubernetes master is running at https://yourip:6443
+
+    $ kubectl get nodes 
+    NAME         STATUS    AGE       VERSION
+    k8s-node-1   Ready     17h       v1.8.2
+    k8s-node-2   Ready     17h       v1.8.2
 
 Deploy your first resources
 ---------------------------
@@ -95,7 +105,20 @@ Dashboard:
     
     # Deploy the dashboard
     $ kubectl apply -f resources/kubernetes-dashboard.yaml
+    
+How to reach the dashboard:
 
+    Directly (only works if you have the client.pfx imported in your cert trust store).
+    
+    $ open https://<your ip>:6443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+    Via proxy:
+    
+    $ kubectl proxy 
+    $ open http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+    
+Note: due of a [bug](https://github.com/kubernetes/dashboard/issues/2465) in Kubernetes /ui doesnt redirect correctly when https is used. This will be fixed in a future release.
+    
 CoreDNS:
     
     $ kubectl apply -f resources/coredns.yaml

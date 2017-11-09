@@ -45,6 +45,46 @@ write_files:
     
     mkdir /var/lib/docker
     mount /dev/vdb /var/lib/docker
+- path: "/srv/kubernetes/kube-proxy.config"
+  permissions: "744"
+  owner: root
+  content: |
+    apiVersion: componentconfig/v1alpha1
+    bindAddress: 0.0.0.0
+    clientConnection:
+      acceptContentTypes: ""
+      burst: 10
+      contentType: application/vnd.kubernetes.protobuf
+      kubeconfig: ""
+      qps: 5
+    clusterCIDR: "10.1.1.0/25"
+    configSyncPeriod: 15m0s
+    conntrack:
+      max: 0
+      maxPerCore: 32768
+      min: 131072
+      tcpCloseWaitTimeout: 1h0m0s
+      tcpEstablishedTimeout: 24h0m0s
+    enableProfiling: false
+    featureGates: "SupportIPVSProxyMode=false"
+    healthzBindAddress: 0.0.0.0:10256
+    hostnameOverride: ""
+    iptables:
+      masqueradeAll: false
+      masqueradeBit: 14
+      minSyncPeriod: 0s
+      syncPeriod: 30s
+    ipvs:
+      minSyncPeriod: 0s
+      scheduler: ""
+      syncPeriod: 0s
+    kind: KubeProxyConfiguration
+    metricsBindAddress: 127.0.0.1:10249
+    mode: iptables
+    oomScoreAdj: -999
+    portRange: ""
+    resourceContainer: /kube-proxy
+    udpTimeoutMilliseconds: 250ms
 coreos:
   units:
     - name: vdbmount.service
@@ -132,24 +172,6 @@ coreos:
         ExecStart=/bin/true
         RemainAfterExit=yes
         Type=oneshot
-    - name: kube-proxy.service
-      command: start
-      content: |
-        [Unit]
-        Description=Kubernetes Proxy
-        Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-        Requires=setup-network-environment.service
-        After=setup-network-environment.service
-
-        [Service]
-        ExecStartPre=/bin/tar -xvzf /opt/kubernetes-server-linux-amd64.tar.gz -C /opt kubernetes/server/bin/kube-proxy
-        ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/kube-proxy
-        ExecStart=/opt/kubernetes/server/bin/kube-proxy \
-        --master=http://{{ k8s_master.default_ip}}:8080 \
-        --cluster-cidr=10.1.1.0/25 \
-        --logtostderr=true
-        Restart=always
-        RestartSec=10
     - name: kube-kubelet.service
       command: start
       content: |
@@ -169,6 +191,29 @@ coreos:
         --kubeconfig=/srv/kubernetes/kubeconfig.yaml \
         --cluster-dns=10.250.0.53 \
         --cluster-domain=cluster.local \
+        --logtostderr=true
+        Restart=always
+        RestartSec=10
+    - name: kube-proxy.service
+      command: start
+      content: |
+        [Unit]
+        Description=Kubernetes Proxy
+        Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+        Requires=kube-kubelet.service
+        After=kube-kubelet.service
+
+        [Service]
+        ExecStartPre=/sbin/modprobe ip_vs
+        ExecStartPre=/sbin/modprobe ip_vs_rr
+        ExecStartPre=/sbin/modprobe ip_vs_wrr
+        ExecStartPre=/sbin/modprobe ip_vs_sh
+        ExecStartPre=/sbin/modprobe nf_conntrack_ipv4
+        ExecStartPre=/bin/tar -xvzf /opt/kubernetes-server-linux-amd64.tar.gz -C /opt kubernetes/server/bin/kube-proxy
+        ExecStartPre=/usr/bin/chmod +x /opt/kubernetes/server/bin/kube-proxy
+        ExecStart=/opt/kubernetes/server/bin/kube-proxy \
+        --master=http://{{ k8s_master.default_ip}}:8080 \
+        --config=/srv/kubernetes/kube-proxy.config \
         --logtostderr=true
         Restart=always
         RestartSec=10

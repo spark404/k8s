@@ -7,6 +7,7 @@
     k8s_num_nodes: 2
     k8s_security_group_name: k8s
     k8s_node_prefix: k8s
+    k8s_cluster_network: 172.16.10.0
     cs_api_url: "{{ cs_api_url }}"
     cs_api_key: "{{ cs_api_key }}"
     cs_api_secret: "{{ cs_api_secret }}"

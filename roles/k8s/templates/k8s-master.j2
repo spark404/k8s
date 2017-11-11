@@ -174,8 +174,6 @@ coreos:
         --service-cluster-ip-range=10.250.0.0/24 \
         --etcd_servers=http://127.0.0.1:4001 \
         --logtostderr=true \
-        --cloud-provider=cloudstack \
-        --cloud-config=/etc/cloudstack.conf \
         --client-ca-file=/srv/kubernetes/ca.crt \
         --tls-cert-file=/srv/kubernetes/server.crt \
         --tls-private-key-file=/srv/kubernetes/server.key \
@@ -202,8 +200,6 @@ coreos:
         --master=127.0.0.1:8080 \
         --service-account-private-key-file=/srv/kubernetes/service-accounts.key \
         --root-ca-file=/srv/kubernetes/ca.crt \
-        --cloud-provider=cloudstack \
-        --cloud-config=/etc/cloudstack.conf \
         --cluster-signing-cert-file=/srv/kubernetes/server.crt --cluster-signing-key-file=/srv/kubernetes/server.key \
         --logtostderr=true
         Restart=always
@@ -238,6 +234,8 @@ coreos:
         ExecStart=/opt/kubernetes/server/bin/cloud-controller-manager \
         --cloud-provider=cloudstack \
         --cloud-config=/etc/cloudstack.conf \
+        --cluster-cidr={{ k8s_cluster_network | ipsubnet(25,0) }} \
+        --leader-elect=true \
         --master=http://127.0.0.1:8080
         Restart=always
         RestartSec=10

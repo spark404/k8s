@@ -8,7 +8,7 @@
       networks: "{{ k8s_cloudstack_network }}"
       ssh_key: "{{ ssh_key }}"
       user_data: "{{ lookup('template', '../templates/k8s-master.j2') }}"
-      ip_address: "10.1.1.10"
+      ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(10) | ipaddr('address') }}"
     register: k8s_master
     
   - debug: msg='k8s master IP is {{ k8s_master.default_ip }}'
@@ -24,6 +24,6 @@
       ssh_key: "{{ ssh_key }}"
       user_data: "{{ lookup('template', '../templates/k8s-node.j2') }}"
       disk_offering: "{{ k8s_node_disktype }}"
-      ip_address: "10.1.1.2{{ item }}"
+      ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(2) | ipaddr('address') }}{{item}}" # need to find a cleaner way
     with_sequence: count={{ k8s_num_nodes }}
     register: k8s_nodes

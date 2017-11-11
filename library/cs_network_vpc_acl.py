@@ -17,7 +17,8 @@ class AnsibleCloudstackNetworkACL(AnsibleCloudStack):
   def updateACL(self):
     args = {
       'aclid': self.module.params.get('aclid'),
-      'networkid': self.module.params.get('networkid')
+      'networkid': self.module.params.get('networkid'),
+      'publicipid': self.module.params.get('publicipid')
     }
 
     if not self.module.check_mode:
@@ -29,11 +30,13 @@ def main():
     aclid = dict(required=True),
     state = dict(choices=['present', 'absent'], default='present'),
     networkid = dict(default=None),
+    publicipid = dict(default=None),
     poll_async = dict(type='bool', default=True),
   ))
 
   module = AnsibleModule(argument_spec=argument_spec, required_together=cs_required_together())
   acs_acl = AnsibleCloudstackNetworkACL(module)
+  acs_acl.updateACL()
 
   result = {}
 

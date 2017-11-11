@@ -57,7 +57,7 @@ write_files:
       contentType: application/vnd.kubernetes.protobuf
       kubeconfig: ""
       qps: 5
-    clusterCIDR: "10.1.1.0/25"
+    clusterCIDR: "{{ k8s_cluster_network | ipsubnet(25,0) }}"
     configSyncPeriod: 15m0s
     conntrack:
       max: 0
@@ -191,6 +191,7 @@ coreos:
         --kubeconfig=/srv/kubernetes/kubeconfig.yaml \
         --cluster-dns=10.250.0.53 \
         --cluster-domain=cluster.local \
+        --cloud-provider=external \
         --logtostderr=true
         Restart=always
         RestartSec=10

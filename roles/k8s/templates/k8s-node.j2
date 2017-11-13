@@ -192,6 +192,7 @@ coreos:
         --cluster-dns=10.250.0.53 \
         --cluster-domain=cluster.local \
         --cloud-provider=external \
+        --volume-plugin-dir=/etc/kubernetes/volumeplugins \
         --logtostderr=true
         Restart=always
         RestartSec=10

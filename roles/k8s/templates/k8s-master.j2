@@ -200,6 +200,8 @@ coreos:
         --master=127.0.0.1:8080 \
         --service-account-private-key-file=/srv/kubernetes/service-accounts.key \
         --root-ca-file=/srv/kubernetes/ca.crt \
+        --cluster-cidr={{ k8s_cluster_network | ipsubnet(25,0) }} \
+        --flex-volume-plugin-dir=/etc/kubernetes/volumeplugins \
         --cluster-signing-cert-file=/srv/kubernetes/server.crt --cluster-signing-key-file=/srv/kubernetes/server.key \
         --logtostderr=true
         Restart=always

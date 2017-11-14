@@ -3,6 +3,7 @@
 ---
 write_files:
 - path: /etc/cloudstack.conf
+  permissions: "0640"
   owner: root
   content: |
     [global]
@@ -32,7 +33,7 @@ write_files:
   content: |
     {{ lookup('file', 'certificates/ca.crt') | indent }}
 - path: "/opt/mount_vdb.sh"
-  permissions: "744"
+  permissions: "0744"
   owner: root
   content: |
     PATH=$PATH:/bin/:/sbin
@@ -45,8 +46,15 @@ write_files:
     
     mkdir /var/lib/docker
     mount /dev/vdb /var/lib/docker
+- path: "/etc/systemd/system.conf.d/kubernetes-accounting.conf"
+  owner: root
+  permissions: "0644"
+  content: |
+    [Manager]
+    DefaultCPUAccounting=yes
+    DefaultMemoryAccounting=yes
 - path: "/srv/kubernetes/kube-proxy.config"
-  permissions: "744"
+  permissions: "0644"
   owner: root
   content: |
     apiVersion: componentconfig/v1alpha1
@@ -153,7 +161,7 @@ coreos:
 
         [Service]
         ExecStartPre=-/usr/bin/mkdir -p /opt/bin
-        ExecStartPre=/usr/bin/wget -N -P /opt/bin https://github.com/kelseyhightower/setup-network-environment/releases/download/v1.0.0/setup-network-environment 
+        ExecStartPre=/usr/bin/wget -N -P /opt/bin https://github.com/kelseyhightower/setup-network-environment/releases/download/1.0.1/setup-network-environment
         ExecStartPre=/usr/bin/chmod +x /opt/bin/setup-network-environment
         ExecStart=/opt/bin/setup-network-environment
         RemainAfterExit=yes

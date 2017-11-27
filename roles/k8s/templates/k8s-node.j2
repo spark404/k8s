@@ -201,7 +201,9 @@ coreos:
         --cluster-domain=cluster.local \
         --cloud-provider=external \
         --volume-plugin-dir=/etc/kubernetes/volumeplugins \
-        --logtostderr=true
+        --logtostderr=true \
+        --provider-id=cloudstack \
+        -v=4
         Restart=always
         RestartSec=10
     - name: kube-proxy.service
@@ -210,7 +212,7 @@ coreos:
         [Unit]
         Description=Kubernetes Proxy
         Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-        Requires=kube-kubelet.service
+        Requires=setup-network-environment.service
         After=kube-kubelet.service
 
         [Service]

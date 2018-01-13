@@ -10,6 +10,7 @@
       requires_hvm: True
       url: "{{ k8s_template_url }}"
       os_type: "CoreOS Family"
+      state: present
     register: k8s_cloudstack_template
 
 #  - debug: msg='k8s_cloudstack_template ID is {{ k8s_cloudstack_template.id }}'

@@ -27,3 +27,12 @@
       ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(2) | ipaddr('address') }}{{item}}" # need to find a cleaner way
     with_sequence: count={{ k8s_num_nodes }}
     register: k8s_nodes
+
+  - name: Create and attach Rook Volumes
+    local_action:
+      module: cs_volume
+      name: "ROOKDATA-{{ k8s_node_prefix }}-node-{{ item }}"
+      vm: "{{ k8s_node_prefix }}-node-{{ item }}" 
+      disk_offering: "{{ k8s_node_disktype }}" 
+      state: attached
+    with_sequence: count={{ k8s_num_nodes }}

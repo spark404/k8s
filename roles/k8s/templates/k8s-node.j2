@@ -11,6 +11,11 @@ write_files:
     api-key={{ cs_api_key }}
     secret-key={{ cs_api_secret }}
     ssl-no-verify={{ cs_ssl_verify }}
+    project-id=
+- path: /srv/kubernetes/ca.crt
+  owner: root
+  content: |
+    {{ lookup('file', 'certificates/ca.crt') | indent}}
 - path: /srv/kubernetes/kubeconfig.yaml
   owner: root
   content: |
@@ -28,10 +33,6 @@ write_files:
         user: kubelet
       name: kubelet-context
     current-context: kubelet-context
-- path: /srv/kubernetes/ca.crt
-  owner: root
-  content: |
-    {{ lookup('file', 'certificates/ca.crt') | indent }}
 - path: "/opt/mount_vdb.sh"
   permissions: "0744"
   owner: root
@@ -207,6 +208,7 @@ coreos:
         --volume-plugin-dir=/etc/kubernetes/volumeplugins \
         --logtostderr=true \
         --provider-id=cloudstack \
+        --allow-privileged \
         -v=4
         Restart=always
         RestartSec=10

@@ -22,6 +22,7 @@ write_files:
     api-key={{ cs_api_key }}
     secret-key={{ cs_api_secret }}
     ssl-no-verify={{ cs_ssl_verify }}
+    project-id=
 - path: /srv/kubernetes/ca.crt
   owner: root
   content: |
@@ -192,6 +193,7 @@ coreos:
         --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds \
         --token-auth-file=/srv/kubernetes/known_tokens.csv \
         --authorization-mode=RBAC \
+        --allow-privileged \
         -v=4
         Restart=always
         RestartSec=10

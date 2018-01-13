@@ -22,7 +22,7 @@ write_files:
     api-key={{ cs_api_key }}
     secret-key={{ cs_api_secret }}
     ssl-no-verify={{ cs_ssl_verify }}
-    project-id={{ k8s_cloudstack_project }}
+    project-id={{ cs_project.id }}
 - path: /srv/kubernetes/ca.crt
   owner: root
   content: |

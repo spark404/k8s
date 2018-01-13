@@ -22,7 +22,7 @@ write_files:
     api-key={{ cs_api_key }}
     secret-key={{ cs_api_secret }}
     ssl-no-verify={{ cs_ssl_verify }}
-    project-id=
+    project-id={{ k8s_cloudstack_project }}
 - path: /srv/kubernetes/ca.crt
   owner: root
   content: |
@@ -159,7 +159,7 @@ coreos:
         After=etcd3.service
 
         [Service]
-        ExecStartPre=/usr/bin/wget -N -P /opt https://dl.k8s.io/{{ k8s_version }}/kubernetes-server-linux-amd64.tar.gz
+        ExecStartPre=/usr/bin/wget -N -P /opt {{k8s_download_prefix}}/{{ k8s_version }}/kubernetes-server-linux-amd64.tar.gz
         ExecStart=/bin/true
         RemainAfterExit=yes
         Type=oneshot

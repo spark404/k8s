@@ -10,6 +10,7 @@
       requires_hvm: True
       url: "{{ k8s_template_url }}"
       os_type: "CoreOS Family"
+      project: "{{ k8s_cloudstack_project }}"
       state: present
     register: k8s_cloudstack_template
 

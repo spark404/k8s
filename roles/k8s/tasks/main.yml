@@ -1,4 +1,5 @@
 ---
+  - include_tasks: create_project.yml
   - include_tasks: create_vpc.yml
   - include_tasks: create_vpc_tier.yml
   - include_tasks: create_vm_template.yml

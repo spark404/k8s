@@ -9,6 +9,7 @@
       ssh_key: "{{ ssh_key }}"
       user_data: "{{ lookup('template', '../templates/k8s-master.j2') }}"
       ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(10) | ipaddr('address') }}"
+      project: "{{ k8s_cloudstack_project }}"
     register: k8s_master
     
   - debug: msg='k8s master IP is {{ k8s_master.default_ip }}'
@@ -25,6 +26,7 @@
       user_data: "{{ lookup('template', '../templates/k8s-node.j2') }}"
       disk_offering: "{{ k8s_node_disktype }}"
       ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(2) | ipaddr('address') }}{{item}}" # need to find a cleaner way
+      project: "{{ k8s_cloudstack_project }}"
     with_sequence: count={{ k8s_num_nodes }}
     register: k8s_nodes
 
@@ -34,5 +36,6 @@
       name: "ROOKDATA-{{ k8s_node_prefix }}-node-{{ item }}"
       vm: "{{ k8s_node_prefix }}-node-{{ item }}" 
       disk_offering: "{{ k8s_node_disktype }}" 
+      project: "{{ k8s_cloudstack_project }}"
       state: attached
     with_sequence: count={{ k8s_num_nodes }}

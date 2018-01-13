@@ -18,7 +18,8 @@ class AnsibleCloudstackNetworkACL(AnsibleCloudStack):
     args = {
       'aclid': self.module.params.get('aclid'),
       'networkid': self.module.params.get('networkid'),
-      'publicipid': self.module.params.get('publicipid')
+      'publicipid': self.module.params.get('publicipid'),
+      'project': self.module.params.get('project')
     }
 
     if not self.module.check_mode:
@@ -32,6 +33,7 @@ def main():
     networkid = dict(default=None),
     publicipid = dict(default=None),
     poll_async = dict(type='bool', default=True),
+    project = dict(default=None),
   ))
 
   module = AnsibleModule(argument_spec=argument_spec, required_together=cs_required_together())

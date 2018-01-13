@@ -1,0 +1,4 @@
+- name: Create Project
+  local_action:
+    module: cs_project
+    name: "{{ k8s_cloudstack_project }}"

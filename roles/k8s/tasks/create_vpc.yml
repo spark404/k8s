@@ -1,0 +1,11 @@
+  - name: Create VPC
+    local_action:
+      module: cs_vpc
+      name: "{{ k8s_cloudstack_vpc }}"
+      display_text: "Kubernetes VPC {{ k8s_cloudstack_vpc }}" 
+      cidr: "{{ k8s_cluster_network | ipsubnet(24, 0) }}"
+      vpc_offering: "{{ k8s_cloudstack_vpc_offering }}"
+      project: "{{ k8s_cloudstack_project }}"
+    register: k8s_vpc
+
+  - debug: msg='k8s_vpc ID is {{ k8s_vpc.id }}'

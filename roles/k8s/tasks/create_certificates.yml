@@ -1,31 +1,66 @@
 - name: Create Folder
-  file: 
-    path: certificates
-    mode: 0755 
+  file:
+    path: certificates/dashboard
+    mode: 0755
     state: directory
+    recurse: yes
 
 - stat:
     path: certificates/server.crt
   register: st
 
+- name: Create master-openssl.cnf
+  template:
+    dest: certificates/master-openssl.cnf
+    src: ../templates/master-openssl.cnf.j2
+
+- name: Create worker-openssl.cnf
+  template:
+    dest: certificates/worker-openssl.cnf
+    src: ../templates/worker-openssl.cnf.j2
 
 - name: Create the certificates for the kubernetes deployement
   shell: |
         openssl genrsa -out certificates/ca.key 2048
-        openssl req -x509 -new -nodes -key certificates/ca.key -subj "/CN={{k8s_external_ip}}" -days 10000 -out certificates/ca.crt
+        openssl req -x509 -new -nodes -key certificates/ca.key -subj "/CN=Kubernetes Root CA" -days 10000 -out certificates/ca.crt
 
+        # Server/API
         openssl genrsa -out certificates/server.key 2048
-        openssl req -new -key certificates/server.key -subj "/CN={{k8s_external_ip}}" -out certificates/server.csr
-
-        openssl x509 -req -in certificates/server.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/server.crt -days 10000
+        openssl req -new -key certificates/server.key -subj "/CN={{k8s_external_ip}}" -out certificates/server.csr -config certificates/master-openssl.cnf
+        openssl x509 -req -in certificates/server.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/server.crt -days 10000 -extensions v3_req -extfile certificates/master-openssl.cnf
         openssl x509  -noout -text -in certificates/server.crt
 
+        # Service Account
         openssl genrsa -out certificates/service-accounts.key 2048
-        openssl req -new -key certificates/service-accounts.key -subj "/CN={{k8s_external_ip}}" -out certificates/service-accounts.csr
+        openssl req -new -key certificates/service-accounts.key -subj "/CN={{k8s_external_ip}}" -out certificates/service-accounts.csr -config certificates/master-openssl.cnf
+        openssl x509 -req -in certificates/service-accounts.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/service-accounts.crt -days 10000 -extensions v3_req -extfile certificates/master-openssl.cnf
+        openssl x509  -noout -text -in certificates/service-account.crt
 
-        openssl x509 -req -in certificates/service-accounts.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/service-accounts.crt -days 10000
-        openssl x509  -noout -text -in certificates/server.crt
+        # User certificate
+        openssl genrsa -out certificates/client.key 2048
+        openssl req -new -key certificates/client.key -subj "/CN={{ k8s_username }}/O=system:masters" -out certificates/client.csr -config certificates/master-openssl.cnf
+        openssl x509 -req -in certificates/client.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/client.crt -days 10000 -extensions v3_req -extfile certificates/master-openssl.cnf
+        openssl x509  -noout -text -in certificates/client.crt
+        openssl pkcs12 -inkey certificates/client.key -in certificates/client.crt -export -out certificates/client.pfx -password "pass:{{ export_password }}"
+
+        # Dashboard
+        openssl genrsa -out certificates/dashboard/dashboard.key 2048
+        openssl req -new -key certificates/dashboard/dashboard.key -subj "/CN={{k8s_external_ip}}" -out certificates/dashboard.csr -config certificates/master-openssl.cnf
+        openssl x509 -req -in certificates/dashboard.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/dashboard/dashboard.crt -days 10000 -extensions v3_req -extfile certificates/master-openssl.cnf
+        openssl x509  -noout -text -in certificates/dashboard/dashboard.crt
   args:
-        executable: /bin/bash
+    executable: /bin/bash
   delegate_to: localhost
+  when: not st.stat.exists
+
+- name: Create worker certificates for the kubernetes deployment
+  shell: |
+        openssl genrsa -out certificates/{{ k8s_node_prefix }}-node-{{ item }}.key 2048
+        WORKER_FQDN={{ k8s_node_prefix }}-node-{{ item }} openssl req -new -key certificates/{{ k8s_node_prefix }}-node-{{ item }}.key -subj "/CN={{ k8s_node_prefix }}-node-{{ item }}" -out certificates/{{ k8s_node_prefix }}-node-{{ item }}.csr -config certificates/worker-openssl.cnf
+        WORKER_FQDN={{ k8s_node_prefix }}-node-{{ item }} openssl x509 -req -in certificates/{{ k8s_node_prefix }}-node-{{ item }}.csr -CA certificates/ca.crt -CAkey certificates/ca.key -CAcreateserial -out certificates/{{ k8s_node_prefix }}-node-{{ item }}.crt -days 10000 -extensions v3_req -extfile certificates/worker-openssl.cnf
+        openssl x509  -noout -text -in certificates/{{ k8s_node_prefix }}-node-{{ item }}.crt
+  args:
+    executable: /bin/bash
+  delegate_to: localhost
+  with_sequence: count={{ k8s_num_nodes }}
   when: not st.stat.exists

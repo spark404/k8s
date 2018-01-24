@@ -4,3 +4,5 @@ cloudstack.ini
 config.yml
 certificates/
 inventory
+.DS_Store
+.vscode/

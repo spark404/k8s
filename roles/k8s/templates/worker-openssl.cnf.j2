@@ -1,0 +1,12 @@
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = $ENV::WORKER_FQDN
+IP.1 = {{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(21) | ipaddr('address') }}
+IP.2 = {{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(22) | ipaddr('address') }}

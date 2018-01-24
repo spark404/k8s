@@ -1,12 +1,15 @@
   - name: Start k8s head node
     local_action:
       module: cs_instance
+      api_http_method: "post"
       name: "{{ k8s_node_prefix }}-head"
       template: "{{ k8s_template }}"
       service_offering: "{{ k8s_instance_type }}"
       networks: "{{ k8s_cloudstack_network }}"
       ssh_key: "{{ ssh_key }}"
       user_data: "{{ lookup('template', '../templates/k8s-master.j2') }}"
+      ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(10) | ipaddr('address') }}"
+      project: "{{ k8s_cloudstack_project }}"
     register: k8s_master
     
   - debug: msg='k8s master IP is {{ k8s_master.default_ip }}'
@@ -14,6 +17,7 @@
   - name: Start k8s nodes
     local_action:
       module: cs_instance
+      api_http_method: "post"
       name: "{{ k8s_node_prefix }}-node-{{ item }}"
       template: "{{ k8s_template }}"
       service_offering: "{{ k8s_instance_type }}"
@@ -21,5 +25,17 @@
       ssh_key: "{{ ssh_key }}"
       user_data: "{{ lookup('template', '../templates/k8s-node.j2') }}"
       disk_offering: "{{ k8s_node_disktype }}"
+      ip_address: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(2) | ipaddr('address') }}{{item}}" # need to find a cleaner way
+      project: "{{ k8s_cloudstack_project }}"
     with_sequence: count={{ k8s_num_nodes }}
     register: k8s_nodes
+
+  - name: Create and attach Rook Volumes
+    local_action:
+      module: cs_volume
+      name: "ROOKDATA-{{ k8s_node_prefix }}-node-{{ item }}"
+      vm: "{{ k8s_node_prefix }}-node-{{ item }}" 
+      disk_offering: "{{ k8s_node_disktype }}" 
+      project: "{{ k8s_cloudstack_project }}"
+      state: attached
+    with_sequence: count={{ k8s_num_nodes }}

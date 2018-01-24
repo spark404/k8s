@@ -2,6 +2,7 @@
     local_action:
       module: cs_sshkeypair
       name: "{{ ssh_key }}"
+      project: "{{ k8s_cloudstack_project }}"
     register: key
     tags: sshkey
 

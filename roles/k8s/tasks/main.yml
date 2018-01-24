@@ -1,5 +1,9 @@
 ---
-  - include: create_certificates.yml
-  - include: create_vm.yml
-  - include: create_inv.yml
-  - include: create_portforward.yml
+  - include_tasks: create_vpc.yml
+  - include_tasks: create_vpc_tier.yml
+  - include_tasks: create_vm_template.yml
+  - include_tasks: create_certificates.yml
+  - include_tasks: create_token.yml
+  - include_tasks: create_vm.yml
+  - include_tasks: create_inv.yml
+  - include_tasks: create_portforward.yml

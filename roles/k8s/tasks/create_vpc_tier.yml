@@ -1,0 +1,45 @@
+  - name: Create VPC Tier Network
+    local_action:
+      module: cs_network
+      name: "{{ k8s_cloudstack_network }}"
+      gateway: "{{ k8s_cluster_network | ipsubnet(25,0) | ipaddr(1) | ipaddr('address') }}"
+      netmask: "255.255.255.128"
+      vpc: "{{ k8s_cloudstack_vpc }}"
+      network_offering: "{{ k8s_cloudstack_network_offering }}"
+      project: "{{ k8s_cloudstack_project }}"
+    register: k8s_vpc_network
+
+  - debug: msg='k8s_vpc_network ID is {{ k8s_vpc_network.id }}'
+  - name: Assign Network ACL (default allow)
+    local_action:
+      module: cs_network_acl
+      name: default_allow
+      vpc: "{{ k8s_cloudstack_vpc }}"
+      project: "{{ k8s_cloudstack_project }}"
+
+  - name: Assign Network ACL (default allow)
+    local_action:
+      module: cs_network_vpc_acl
+      aclid: "23fa8945-9848-11e5-9afa-525400b8977a"
+      networkid: "{{ k8s_vpc_network.id }}"
+      project: "{{ k8s_cloudstack_project }}"
+
+  - name: Network public IP
+    local_action:
+      module: cs_get_ip_address
+      network: "{{ k8s_cloudstack_network }}"
+      vpc: "{{ k8s_cloudstack_vpc }}"
+      project: "{{ k8s_cloudstack_project }}"
+    register: k8s_vpc_network_ip
+  - debug: msg='k8s_vpc_network_ip is {{ k8s_vpc_network_ip.ip_address }}'
+  - debug: msg='k8s_vpc_network_ip.id is {{ k8s_vpc_network_ip.id }}'
+
+  - name: Assign Network ACL (default allow) for public IP
+    local_action:
+      module: cs_network_vpc_acl
+      #name: "default_allow"
+      project: "{{ k8s_cloudstack_project }}"
+      aclid: "23fa8945-9848-11e5-9afa-525400b8977a"
+      publicipid: "{{ k8s_vpc_network_ip.id }}"
+
+
